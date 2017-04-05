@@ -20,6 +20,7 @@ public class CalculatorFrame extends javax.swing.JFrame
     private boolean isOperand1 = true;
     private boolean isOperand2 = false;
     private boolean isResult = false;
+    private boolean pressedEqual = false;
     
     private boolean plus = false;
     public CalculatorFrame() 
@@ -60,6 +61,11 @@ public class CalculatorFrame extends javax.swing.JFrame
         @Override
         public void actionPerformed(ActionEvent e) {
             //needs to refresh after operation
+            if (pressedEqual == true)
+            {
+                jCalcField.setText("" + result);
+                pressedEqual = false;
+            }
             result = result*10;
             if(e.getSource().equals(jButton1)){
                 result += 1;
@@ -107,6 +113,7 @@ public class CalculatorFrame extends javax.swing.JFrame
                 result += operand2;
                 JCalcField.setText(operand1 + " + " + operand2 + " = " + result);
                 plus = false;
+                pressedEqual = true;
             }
         }
     }
