@@ -10,7 +10,7 @@ import java.awt.event.ActionListener;
 
 /**
  *
- * @author David
+ * Java Programming Project
  */
 public class CalculatorFrame extends javax.swing.JFrame
 {
