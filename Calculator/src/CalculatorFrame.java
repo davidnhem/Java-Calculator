@@ -1,16 +1,9 @@
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
- *
- * Java Programming Project
+ * Java calculator
+ * 
  */
 public class CalculatorFrame extends javax.swing.JFrame
 {
@@ -20,9 +13,13 @@ public class CalculatorFrame extends javax.swing.JFrame
     private boolean isOperand1 = true;
     private boolean isOperand2 = false;
     private boolean isResult = false;
-    private boolean pressedEqual = false;
+    private boolean punchedEqual  = false;
     
-    private boolean plus = false;
+    private boolean plus     = false;
+    private boolean minus    = false;
+    private boolean multiply = false;
+    private boolean divide   = false;
+    
     public CalculatorFrame() 
     {
         OperatorHandler operatorHandler = new OperatorHandler();
@@ -45,11 +42,11 @@ public class CalculatorFrame extends javax.swing.JFrame
         jButtonPlus.addActionListener(operatorHandler);
         jButtonMinus.addActionListener(operatorHandler);
         jButtonEqual.addActionListener(operatorHandler);
-        
         jButtonClear.addActionListener(clearHandler);
+        
         display();
-        this.setLocationRelativeTo(null);
         this.setTitle("Calculator");
+        this.setLocationRelativeTo(null);
     }
     
     public void display()
@@ -57,76 +54,135 @@ public class CalculatorFrame extends javax.swing.JFrame
         JCalcField.setText("Basic Calculator");
     }
     
-    public class DigitHandler implements ActionListener{
+    private class DigitHandler implements ActionListener
+    {
         @Override
-        public void actionPerformed(ActionEvent e) {
+        public void actionPerformed(ActionEvent e) 
+        {
             //needs to refresh after operation
-            if (pressedEqual == true)
-            {
-                jCalcField.setText("" + result);
-                pressedEqual = false;
-            }
+            String digitPressed = e.getActionCommand();
             result = result*10;
-            if(e.getSource().equals(jButton1)){
-                result += 1;
-            }else if(e.getSource().equals(jButton2)){
-                result += 2;
-            }else if(e.getSource().equals(jButton3)){
-                result += 3;
-            }else if(e.getSource().equals(jButton4)){
-                result += 4;
-            }else if(e.getSource().equals(jButton5)){
-                result += 5;
-            }else if(e.getSource().equals(jButton6)){
-                result += 6;
-            }else if(e.getSource().equals(jButton7)){
-                result += 7;
-            }else if(e.getSource().equals(jButton8)){
-                result += 8;
-            }else if(e.getSource().equals(jButton9)){
-                result += 9;
-            }else if(e.getSource().equals(jButton0)){
-//                result += 0;
-            }
-            if(plus == false){
-                JCalcField.setText("" + result);
-            }else if(plus == true)
+            
+            if (punchedEqual == true) 
             {
-                JCalcField.setText(operand2 + " + " + result);
+                resetC();
+                punchedEqual = false;
             }
             
+            switch (digitPressed) 
+            {
+                case "1":
+                    result += 1;
+                    break;
+                case "2":
+                    result += 2;
+                    break;
+                case "3":
+                    result += 3;
+                    break;
+                case "4":
+                    result += 4;
+                    break;
+                case "5":
+                    result += 5;
+                    break;
+                case "6":
+                    result += 6;
+                    break;
+                case "7":
+                    result += 7;
+                    break;
+                case "8":
+                    result += 8;
+                    break;
+                case "9":
+                    result += 9;
+                    break;
+                case "0":
+                    result += 0;
+                    break; 
+            }       
+            if(plus == false)
+            {
+                JCalcField.setText("" + result);
+            }
+            else if(plus == true)
+            {
+                JCalcField.setText(operand2 + " + " + result);
+            } 
         }
         
     }
     
-    public class OperatorHandler implements ActionListener{
+    private class OperatorHandler implements ActionListener
+    {
         @Override
-        public void actionPerformed(ActionEvent e) {
+        public void actionPerformed(ActionEvent e) 
+        {
             //needs to account any subsequent clicks of plus
-            if(e.getSource().equals(jButtonPlus)){
-                operand2 = result;
-                result = 0;
-                JCalcField.setText(operand2 + " + " + result);
-                plus = true;
-            }else if(e.getSource().equals(jButtonEqual)){
-                double operand1 = result;
-                result += operand2;
-                JCalcField.setText(operand1 + " + " + operand2 + " = " + result);
-                plus = false;
-                pressedEqual = true;
+            String operatorPressed = e.getActionCommand();
+            String temp;
+            switch(operatorPressed)
+            {
+                case "+":
+                    temp = new String("+");
+                    operand2 = result;
+                    result = 0;
+                    JCalcField.setText(operand2 + " + " + result);
+                    plus = true;
+                    break;
+                case "-":
+                    temp = "-";
+                    operand2 = result;
+                    result = 0;
+                    JCalcField.setText(operand2 + " - " + result);
+                    minus = true;
+                    break;   
+                    
+                case "X":
+                    temp = "X";
+                    operand2 = result;
+                    result = 0;
+                    JCalcField.setText(operand2 + " X " + result);
+                    multiply = true;
+                    break; 
+                case "Ã·":
+                    temp = "Ã·";
+                    operand2 = result;
+                    result = 0;
+                    JCalcField.setText(operand2 + " Ã· " + result);
+                    divide = true;
+                    break;    
+                    
+                case "=":
+                    double operand1 = result;
+//                    if (temp.equals("+"))
+//                    {
+                        result += operand2;
+                        JCalcField.setText(operand2 + " + " + operand1 + " = " + result);
+                        plus = false;
+                        punchedEqual = true;
+                        break;
+//                    }                        
+            }    
+        }
+    }
+    
+    private class ClearHandler implements ActionListener{
+        @Override
+        public void actionPerformed(ActionEvent e)
+        {
+            //to C, or to CE?
+            if(e.getSource().equals(jButtonClear))
+            {
+                resetC();
             }
         }
     }
     
-    public class ClearHandler implements ActionListener{
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            //to C, or to CE?
-            if(e.getSource().equals(jButtonClear)){
-                result = 0;
-                JCalcField.setText(""+result);
-            }
-        }
+    private void resetC(){
+        result = 0;
+        JCalcField.setText(""+result);
     }
 
     /**
@@ -139,132 +195,371 @@ public class CalculatorFrame extends javax.swing.JFrame
     private void initComponents() {
 
         JCalcField = new javax.swing.JTextField();
+        jPanel1 = new javax.swing.JPanel();
+        jButtonClear = new javax.swing.JButton();
+        jButton9 = new javax.swing.JButton();
+        jButton8 = new javax.swing.JButton();
+        jButtonDecimal = new javax.swing.JButton();
+        jButton5 = new javax.swing.JButton();
+        jButton6 = new javax.swing.JButton();
+        jButton7 = new javax.swing.JButton();
+        jButton0 = new javax.swing.JButton();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
-        jButton5 = new javax.swing.JButton();
-        jButton6 = new javax.swing.JButton();
-        jButton7 = new javax.swing.JButton();
-        jButton8 = new javax.swing.JButton();
-        jButton9 = new javax.swing.JButton();
-        jButton10 = new javax.swing.JButton();
-        jButton0 = new javax.swing.JButton();
-        jButtonClear = new javax.swing.JButton();
+        jPanel2 = new javax.swing.JPanel();
         jButtonPlus = new javax.swing.JButton();
         jButtonMinus = new javax.swing.JButton();
+        jButtonDivide = new javax.swing.JButton();
         jButtonEqual = new javax.swing.JButton();
+        jButtonMultiply = new javax.swing.JButton();
+        jButtonModule = new javax.swing.JButton();
+        jPanel3 = new javax.swing.JPanel();
+        jPanel4 = new javax.swing.JPanel();
+        jButtonTanX = new javax.swing.JButton();
+        jButtonSquare = new javax.swing.JButton();
+        jButtonCube = new javax.swing.JButton();
+        jButtonÏ€ = new javax.swing.JButton();
+        jButtonEPowerX = new javax.swing.JButton();
+        jButtonCosX = new javax.swing.JButton();
+        jButton1DivX = new javax.swing.JButton();
+        jButtonLnX = new javax.swing.JButton();
+        jButtonSinX = new javax.swing.JButton();
+        jButtonE = new javax.swing.JButton();
+        jButtonSQRT = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Calculator");
+        setBounds(new java.awt.Rectangle(240, 240, 240, 240));
+        setLocation(new java.awt.Point(23, 56));
+        setMaximumSize(null);
+        setShape(getShape());
+        setSize(new java.awt.Dimension(329, 228));
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         JCalcField.setEditable(false);
-        JCalcField.setText("jTextField1");
-
-        jButton1.setText("1");
-
-        jButton2.setText("2");
-
-        jButton3.setText("3");
-
-        jButton4.setText("4");
-
-        jButton5.setText("5");
-
-        jButton6.setText("6");
-
-        jButton7.setText("7");
-
-        jButton8.setText("8");
-
-        jButton9.setText("9");
-
-        jButton10.setText("F");
-
-        jButton0.setText("0");
+        JCalcField.setText("Basic Calculator");
+        getContentPane().add(JCalcField, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 11, 410, 61));
 
         jButtonClear.setText("C");
+        jButtonClear.setPreferredSize(new java.awt.Dimension(41, 23));
 
+        jButton9.setForeground(new java.awt.Color(0, 102, 102));
+        jButton9.setText("9");
+        jButton9.setPreferredSize(new java.awt.Dimension(41, 23));
+
+        jButton8.setForeground(new java.awt.Color(0, 102, 102));
+        jButton8.setText("8");
+        jButton8.setPreferredSize(new java.awt.Dimension(41, 23));
+
+        jButtonDecimal.setForeground(new java.awt.Color(153, 0, 0));
+        jButtonDecimal.setText(".");
+        jButtonDecimal.setPreferredSize(new java.awt.Dimension(41, 23));
+
+        jButton5.setForeground(new java.awt.Color(0, 102, 102));
+        jButton5.setText("5");
+        jButton5.setPreferredSize(new java.awt.Dimension(41, 23));
+
+        jButton6.setForeground(new java.awt.Color(0, 102, 102));
+        jButton6.setText("6");
+        jButton6.setPreferredSize(new java.awt.Dimension(41, 23));
+
+        jButton7.setForeground(new java.awt.Color(0, 102, 102));
+        jButton7.setText("7");
+        jButton7.setPreferredSize(new java.awt.Dimension(41, 23));
+
+        jButton0.setForeground(new java.awt.Color(0, 102, 102));
+        jButton0.setText("0");
+        jButton0.setPreferredSize(new java.awt.Dimension(41, 23));
+
+        jButton1.setForeground(new java.awt.Color(0, 102, 102));
+        jButton1.setText("1");
+        jButton1.setPreferredSize(new java.awt.Dimension(41, 23));
+
+        jButton2.setForeground(new java.awt.Color(0, 102, 102));
+        jButton2.setText("2");
+        jButton2.setPreferredSize(new java.awt.Dimension(41, 23));
+
+        jButton3.setForeground(new java.awt.Color(0, 102, 102));
+        jButton3.setText("3");
+        jButton3.setPreferredSize(new java.awt.Dimension(41, 23));
+
+        jButton4.setForeground(new java.awt.Color(0, 102, 102));
+        jButton4.setText("4");
+        jButton4.setPreferredSize(new java.awt.Dimension(41, 23));
+
+        jButtonPlus.setForeground(new java.awt.Color(0, 0, 255));
         jButtonPlus.setText("+");
+        jButtonPlus.setMaximumSize(null);
 
+        jButtonMinus.setForeground(new java.awt.Color(0, 0, 255));
         jButtonMinus.setText("-");
+        jButtonMinus.setMaximumSize(null);
+        jButtonMinus.setPreferredSize(new java.awt.Dimension(41, 23));
 
+        jButtonDivide.setForeground(new java.awt.Color(0, 0, 255));
+        jButtonDivide.setText("Ã·");
+        jButtonDivide.setMaximumSize(null);
+        jButtonDivide.setPreferredSize(new java.awt.Dimension(41, 23));
+
+        jButtonEqual.setForeground(new java.awt.Color(255, 0, 0));
         jButtonEqual.setText("=");
+        jButtonEqual.setMaximumSize(null);
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(JCalcField, javax.swing.GroupLayout.PREFERRED_SIZE, 370, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                .addComponent(jButton10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jButton7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(jButton8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jButton0, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(jButton9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jButtonClear, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jButtonEqual, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                            .addComponent(jButton4)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jButton5)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jButton6)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jButtonMinus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGroup(layout.createSequentialGroup()
-                            .addComponent(jButton1)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jButton2)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jButton3)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jButtonPlus))))
-                .addContainerGap(20, Short.MAX_VALUE))
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jButtonEqual, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jButtonDivide, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jButtonMinus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jButtonPlus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(JCalcField, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jButtonPlus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(6, 6, 6)
+                .addComponent(jButtonMinus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(6, 6, 6)
+                .addComponent(jButtonDivide, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton2)
-                    .addComponent(jButton1)
-                    .addComponent(jButton3)
-                    .addComponent(jButtonPlus))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton4)
-                    .addComponent(jButton5)
-                    .addComponent(jButton6)
-                    .addComponent(jButtonMinus))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton7)
-                    .addComponent(jButton8)
-                    .addComponent(jButton9)
-                    .addComponent(jButtonEqual))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton10)
-                    .addComponent(jButton0)
-                    .addComponent(jButtonClear))
-                .addContainerGap(112, Short.MAX_VALUE))
+                .addComponent(jButtonEqual, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
+
+        jButtonPlus.getAccessibleContext().setAccessibleName("");
+        jButtonPlus.getAccessibleContext().setAccessibleParent(jPanel1);
+        jButtonMinus.getAccessibleContext().setAccessibleName("");
+        jButtonMinus.getAccessibleContext().setAccessibleParent(jPanel1);
+        jButtonDivide.getAccessibleContext().setAccessibleName("");
+        jButtonDivide.getAccessibleContext().setAccessibleParent(jPanel1);
+        jButtonEqual.getAccessibleContext().setAccessibleName("");
+        jButtonEqual.getAccessibleContext().setAccessibleParent(jPanel1);
+
+        jButtonMultiply.setForeground(new java.awt.Color(0, 0, 255));
+        jButtonMultiply.setText("X");
+        jButtonMultiply.setPreferredSize(new java.awt.Dimension(41, 23));
+        jButtonMultiply.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                none(evt);
+            }
+        });
+
+        jButtonModule.setForeground(new java.awt.Color(0, 0, 255));
+        jButtonModule.setText("%");
+        jButtonModule.setPreferredSize(new java.awt.Dimension(41, 23));
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                        .addGap(6, 6, 6)
+                        .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton6, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                        .addGap(6, 6, 6)
+                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                                    .addComponent(jButtonDecimal, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                                .addGap(6, 6, 6))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jButtonModule, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(5, 5, 5)))
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jButtonMultiply, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
+                            .addComponent(jButton8, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                            .addComponent(jButton0, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                        .addGap(6, 6, 6)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jButton9, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
+                            .addComponent(jButtonClear, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(6, 6, 6)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jButton4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jButton5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jButton6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(6, 6, 6)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jButton7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jButton8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jButton9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(6, 6, 6)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jButtonDecimal, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jButton0, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jButtonClear, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButtonMultiply, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jButtonModule, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
+        );
+
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 90, -1, -1));
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+
+        getContentPane().add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(409, 275, -1, -1));
+
+        jButtonTanX.setForeground(new java.awt.Color(153, 0, 153));
+        jButtonTanX.setText("tanx");
+
+        jButtonSquare.setForeground(new java.awt.Color(0, 153, 0));
+        jButtonSquare.setText("^2");
+
+        jButtonCube.setForeground(new java.awt.Color(0, 153, 0));
+        jButtonCube.setText("^3");
+
+        jButtonÏ€.setForeground(new java.awt.Color(102, 102, 0));
+        jButtonÏ€.setText("Ï€");
+        jButtonÏ€.setPreferredSize(new java.awt.Dimension(39, 23));
+
+        jButtonEPowerX.setForeground(new java.awt.Color(0, 153, 51));
+        jButtonEPowerX.setText("e^x");
+
+        jButtonCosX.setForeground(new java.awt.Color(153, 0, 153));
+        jButtonCosX.setText("cosx");
+
+        jButton1DivX.setForeground(new java.awt.Color(102, 153, 0));
+        jButton1DivX.setText("1/x");
+
+        jButtonLnX.setForeground(new java.awt.Color(0, 153, 51));
+        jButtonLnX.setText("lnx");
+
+        jButtonSinX.setForeground(new java.awt.Color(153, 0, 153));
+        jButtonSinX.setText("sinx");
+
+        jButtonE.setForeground(new java.awt.Color(102, 102, 0));
+        jButtonE.setText("e");
+
+        jButtonSQRT.setForeground(new java.awt.Color(255, 153, 0));
+        jButtonSQRT.setText("SQRT");
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jButtonEPowerX)
+                            .addComponent(jButtonÏ€, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(6, 6, 6)
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jButtonLnX)
+                            .addComponent(jButtonE))
+                        .addGap(6, 6, 6)
+                        .addComponent(jButtonSQRT))
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jButtonSquare)
+                            .addComponent(jButtonSinX))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 7, Short.MAX_VALUE)
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
+                                .addComponent(jButtonCosX)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jButtonTanX))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
+                                .addComponent(jButtonCube)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jButton1DivX)))))
+                .addContainerGap())
+        );
+
+        jPanel4Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jButton1DivX, jButtonCosX, jButtonCube, jButtonE, jButtonEPowerX, jButtonLnX, jButtonSQRT, jButtonSinX, jButtonSquare, jButtonTanX, jButtonÏ€});
+
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jButtonSquare)
+                    .addComponent(jButtonCube)
+                    .addComponent(jButton1DivX))
+                .addGap(6, 6, 6)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jButtonSinX)
+                    .addComponent(jButtonCosX)
+                    .addComponent(jButtonTanX))
+                .addGap(6, 6, 6)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jButtonEPowerX)
+                    .addComponent(jButtonLnX)
+                    .addComponent(jButtonSQRT))
+                .addGap(6, 6, 6)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jButtonÏ€, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButtonE))
+                .addContainerGap())
+        );
+
+        jPanel4Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {jButton1DivX, jButtonCosX, jButtonCube, jButtonE, jButtonEPowerX, jButtonLnX, jButtonSQRT, jButtonSinX, jButtonSquare, jButtonTanX, jButtonÏ€});
+
+        jButtonTanX.getAccessibleContext().setAccessibleParent(jPanel2);
+        jButtonSquare.getAccessibleContext().setAccessibleParent(jPanel2);
+        jButtonCube.getAccessibleContext().setAccessibleParent(jPanel2);
+        jButtonÏ€.getAccessibleContext().setAccessibleParent(jPanel2);
+        jButtonEPowerX.getAccessibleContext().setAccessibleParent(jPanel2);
+        jButtonCosX.getAccessibleContext().setAccessibleParent(jPanel2);
+        jButton1DivX.getAccessibleContext().setAccessibleParent(jPanel2);
+        jButtonLnX.getAccessibleContext().setAccessibleParent(jPanel2);
+        jButtonSinX.getAccessibleContext().setAccessibleParent(jPanel2);
+        jButtonE.getAccessibleContext().setAccessibleParent(jPanel2);
+        jButtonSQRT.getAccessibleContext().setAccessibleParent(jPanel2);
+
+        getContentPane().add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 90, -1, -1));
+
+        getAccessibleContext().setAccessibleName("");
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void none(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_none
+        // TODO add your handling code here:
+    }//GEN-LAST:event_none
 
     /**
      * @param args the command line arguments
@@ -304,7 +599,7 @@ public class CalculatorFrame extends javax.swing.JFrame
     private javax.swing.JTextField JCalcField;
     private javax.swing.JButton jButton0;
     private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton10;
+    private javax.swing.JButton jButton1DivX;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
@@ -314,8 +609,26 @@ public class CalculatorFrame extends javax.swing.JFrame
     private javax.swing.JButton jButton8;
     private javax.swing.JButton jButton9;
     private javax.swing.JButton jButtonClear;
+    private javax.swing.JButton jButtonCosX;
+    private javax.swing.JButton jButtonCube;
+    private javax.swing.JButton jButtonDecimal;
+    private javax.swing.JButton jButtonDivide;
+    private javax.swing.JButton jButtonE;
+    private javax.swing.JButton jButtonEPowerX;
     private javax.swing.JButton jButtonEqual;
+    private javax.swing.JButton jButtonLnX;
     private javax.swing.JButton jButtonMinus;
+    private javax.swing.JButton jButtonModule;
+    private javax.swing.JButton jButtonMultiply;
     private javax.swing.JButton jButtonPlus;
+    private javax.swing.JButton jButtonSQRT;
+    private javax.swing.JButton jButtonSinX;
+    private javax.swing.JButton jButtonSquare;
+    private javax.swing.JButton jButtonTanX;
+    private javax.swing.JButton jButtonÏ€;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
     // End of variables declaration//GEN-END:variables
 }
