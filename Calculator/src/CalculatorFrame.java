@@ -1,3 +1,4 @@
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -8,17 +9,27 @@ import java.awt.event.ActionListener;
 public class CalculatorFrame extends javax.swing.JFrame
 {
 
-    private double result;
-    private double operand2;
-    private boolean isOperand1 = true;
-    private boolean isOperand2 = false;
-    private boolean isResult = false;
-    private boolean punchedEqual  = false;
+    private double curOperand;
+    private double prevOperand;
+    private boolean justFinishedOperation  = false;
     
     private boolean plus     = false;
     private boolean minus    = false;
     private boolean multiply = false;
     private boolean divide   = false;
+    private boolean pressedDot = false;
+    private int countSinceDot = 0;
+    private static String operator = " ";
+    
+    private void resetBoolean(){
+        justFinishedOperation = false;
+        pressedDot = false;
+        countSinceDot = 0;
+        plus = false;
+        minus = false;
+        multiply = false;
+        divide = false;
+    }
     
     public CalculatorFrame() 
     {
@@ -28,6 +39,7 @@ public class CalculatorFrame extends javax.swing.JFrame
         
         initComponents();
         
+        operator = "";
         jButton1.addActionListener(digitHandler);
         jButton2.addActionListener(digitHandler);
         jButton3.addActionListener(digitHandler);
@@ -38,10 +50,16 @@ public class CalculatorFrame extends javax.swing.JFrame
         jButton8.addActionListener(digitHandler);
         jButton9.addActionListener(digitHandler);
         jButton0.addActionListener(digitHandler);
+        jButtonDecimal.addActionListener(digitHandler);
+
         
         jButtonPlus.addActionListener(operatorHandler);
         jButtonMinus.addActionListener(operatorHandler);
+        jButtonMultiply.addActionListener(operatorHandler);
+        jButtonDivide.addActionListener(operatorHandler);
         jButtonEqual.addActionListener(operatorHandler);
+        
+        
         jButtonClear.addActionListener(clearHandler);
         
         display();
@@ -61,55 +79,83 @@ public class CalculatorFrame extends javax.swing.JFrame
         {
             //needs to refresh after operation
             String digitPressed = e.getActionCommand();
-            result = result*10;
+            if(!pressedDot){
+                curOperand *= 10;//shifting left
+            }else{
+                countSinceDot++;
+            }
+
             
-            if (punchedEqual == true) 
+            if (justFinishedOperation == true) 
             {
                 resetC();
-                punchedEqual = false;
+                justFinishedOperation = false;
             }
             
             switch (digitPressed) 
             {
                 case "1":
-                    result += 1;
+                    curOperand += 1 * Math.pow(10, -countSinceDot);
                     break;
                 case "2":
-                    result += 2;
+                    curOperand += 2 * Math.pow(10, -countSinceDot);
                     break;
                 case "3":
-                    result += 3;
+                    curOperand += 3 * Math.pow(10, -countSinceDot);
                     break;
                 case "4":
-                    result += 4;
+                    curOperand += 4 * Math.pow(10, -countSinceDot);
                     break;
                 case "5":
-                    result += 5;
+                    curOperand += 5 * Math.pow(10, -countSinceDot);
                     break;
                 case "6":
-                    result += 6;
+                    curOperand += 6 * Math.pow(10, -countSinceDot);
                     break;
                 case "7":
-                    result += 7;
+                    curOperand += 7 * Math.pow(10, -countSinceDot);
                     break;
                 case "8":
-                    result += 8;
+                    curOperand += 8 * Math.pow(10, -countSinceDot);
                     break;
                 case "9":
-                    result += 9;
+                    curOperand += 9 * Math.pow(10, -countSinceDot);
                     break;
                 case "0":
-                    result += 0;
+                    curOperand += 0;
                     break; 
+                case ".":
+                    if(!pressedDot){
+                        pressedDot = true;
+                        curOperand /= 10;
+                    }
+                    
             }       
-            if(plus == false)
-            {
-                JCalcField.setText("" + result);
+//            if(plus == false)
+//            {
+//                JCalcField.setText("" + curOperand);
+//            }
+//            else if(plus == true)
+//            {
+//                JCalcField.setText(prevOperand + " + " + curOperand);
+//            }
+
+            //no operater boolean true
+            if(!plus&&!minus&&!multiply&&!divide == true){
+                JCalcField.setText(""+curOperand);
+            }else{
+                //one operator boolean true
+                JCalcField.setText(prevOperand + operator + curOperand);
             }
-            else if(plus == true)
-            {
-                JCalcField.setText(operand2 + " + " + result);
-            } 
+            
+//            if(minus == false)
+//            {
+//                JCalcField.setText("" + result);
+//            }    
+//            else
+//            {
+//                JCalcField.setText(operand2 + " - " + result);
+//            }    
         }
         
     }
@@ -121,49 +167,76 @@ public class CalculatorFrame extends javax.swing.JFrame
         {
             //needs to account any subsequent clicks of plus
             String operatorPressed = e.getActionCommand();
-            String temp;
+            //put resetBoolean() here instead?
             switch(operatorPressed)
             {
                 case "+":
-                    temp = new String("+");
-                    operand2 = result;
-                    result = 0;
-                    JCalcField.setText(operand2 + " + " + result);
+                    operator = " + ";
+                    prevOperand = curOperand;
+                    curOperand = 0;
+                    JCalcField.setText(prevOperand + " + " + curOperand);
+                    resetBoolean();
                     plus = true;
                     break;
+                    
                 case "-":
-                    temp = "-";
-                    operand2 = result;
-                    result = 0;
-                    JCalcField.setText(operand2 + " - " + result);
+                    operator = " - ";
+                    prevOperand = curOperand;
+                    curOperand = 0;
+                    JCalcField.setText(prevOperand + " - " + curOperand);
+                    resetBoolean();
                     minus = true;
                     break;   
                     
                 case "X":
-                    temp = "X";
-                    operand2 = result;
-                    result = 0;
-                    JCalcField.setText(operand2 + " X " + result);
+                    operator = " * ";
+                    prevOperand = curOperand;
+                    curOperand = 0;
+                    JCalcField.setText(prevOperand + " * " + curOperand);
+                    resetBoolean();
                     multiply = true;
                     break; 
-                case "Ã·":
-                    temp = "Ã·";
-                    operand2 = result;
-                    result = 0;
-                    JCalcField.setText(operand2 + " Ã· " + result);
+                case "÷":
+                    operator = " ÷ ";
+                    prevOperand = curOperand;
+                    curOperand = 0;
+                    JCalcField.setText(prevOperand + " ÷ " + curOperand);
+                    resetBoolean();
                     divide = true;
-                    break;    
-                    
+                    break;
                 case "=":
-                    double operand1 = result;
-//                    if (temp.equals("+"))
-//                    {
-                        result += operand2;
-                        JCalcField.setText(operand2 + " + " + operand1 + " = " + result);
-                        plus = false;
-                        punchedEqual = true;
-                        break;
-//                    }                        
+                    double result = 0;
+                    switch (operator)
+                    {
+                        case " + ":
+                            result = prevOperand + curOperand;
+                            JCalcField.setText(prevOperand + " + " + curOperand + " = " + result);
+                            plus = false;
+                            justFinishedOperation = true;
+                            break;
+                              
+                        case " - ":
+                            result = prevOperand - curOperand;
+                            JCalcField.setText(prevOperand + " - " + curOperand + " = " + result);
+                            minus = false;
+                            justFinishedOperation = true;
+                            break;   
+                            
+                         case " * ":
+                            result = prevOperand * curOperand;
+                            JCalcField.setText(prevOperand + " X " + curOperand + " = " + result);
+                            multiply = false;
+                            justFinishedOperation = true;
+                            break;
+                       case " ÷ ":
+                            result = prevOperand / curOperand;
+                            JCalcField.setText(prevOperand + " ÷ " + curOperand + " = " + result);
+                            divide = false;
+                            justFinishedOperation = true;
+                            break;
+                    }
+                //finally clause of "="
+                ;operator = " ";
             }    
         }
     }
@@ -181,8 +254,10 @@ public class CalculatorFrame extends javax.swing.JFrame
     }
     
     private void resetC(){
-        result = 0;
-        JCalcField.setText(""+result);
+        curOperand = 0;
+        prevOperand = 0;
+        resetBoolean();
+        JCalcField.setText(""+curOperand);
     }
 
     /**
@@ -191,7 +266,7 @@ public class CalculatorFrame extends javax.swing.JFrame
      * regenerated by the Form Editor.
      */
     @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
     private void initComponents() {
 
         JCalcField = new javax.swing.JTextField();
@@ -220,7 +295,7 @@ public class CalculatorFrame extends javax.swing.JFrame
         jButtonTanX = new javax.swing.JButton();
         jButtonSquare = new javax.swing.JButton();
         jButtonCube = new javax.swing.JButton();
-        jButtonÏ€ = new javax.swing.JButton();
+        jButtonπ = new javax.swing.JButton();
         jButtonEPowerX = new javax.swing.JButton();
         jButtonCosX = new javax.swing.JButton();
         jButton1DivX = new javax.swing.JButton();
@@ -299,7 +374,7 @@ public class CalculatorFrame extends javax.swing.JFrame
         jButtonMinus.setPreferredSize(new java.awt.Dimension(41, 23));
 
         jButtonDivide.setForeground(new java.awt.Color(0, 0, 255));
-        jButtonDivide.setText("Ã·");
+        jButtonDivide.setText("÷");
         jButtonDivide.setMaximumSize(null);
         jButtonDivide.setPreferredSize(new java.awt.Dimension(41, 23));
 
@@ -450,9 +525,9 @@ public class CalculatorFrame extends javax.swing.JFrame
         jButtonCube.setForeground(new java.awt.Color(0, 153, 0));
         jButtonCube.setText("^3");
 
-        jButtonÏ€.setForeground(new java.awt.Color(102, 102, 0));
-        jButtonÏ€.setText("Ï€");
-        jButtonÏ€.setPreferredSize(new java.awt.Dimension(39, 23));
+        jButtonπ.setForeground(new java.awt.Color(102, 102, 0));
+        jButtonπ.setText("π");
+        jButtonπ.setPreferredSize(new java.awt.Dimension(39, 23));
 
         jButtonEPowerX.setForeground(new java.awt.Color(0, 153, 51));
         jButtonEPowerX.setText("e^x");
@@ -485,7 +560,7 @@ public class CalculatorFrame extends javax.swing.JFrame
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jButtonEPowerX)
-                            .addComponent(jButtonÏ€, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jButtonπ, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(6, 6, 6)
                         .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jButtonLnX)
@@ -509,7 +584,7 @@ public class CalculatorFrame extends javax.swing.JFrame
                 .addContainerGap())
         );
 
-        jPanel4Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jButton1DivX, jButtonCosX, jButtonCube, jButtonE, jButtonEPowerX, jButtonLnX, jButtonSQRT, jButtonSinX, jButtonSquare, jButtonTanX, jButtonÏ€});
+        jPanel4Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jButton1DivX, jButtonCosX, jButtonCube, jButtonE, jButtonEPowerX, jButtonLnX, jButtonSQRT, jButtonSinX, jButtonSquare, jButtonTanX, jButtonπ});
 
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -531,17 +606,17 @@ public class CalculatorFrame extends javax.swing.JFrame
                     .addComponent(jButtonSQRT))
                 .addGap(6, 6, 6)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jButtonÏ€, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButtonπ, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButtonE))
                 .addContainerGap())
         );
 
-        jPanel4Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {jButton1DivX, jButtonCosX, jButtonCube, jButtonE, jButtonEPowerX, jButtonLnX, jButtonSQRT, jButtonSinX, jButtonSquare, jButtonTanX, jButtonÏ€});
+        jPanel4Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {jButton1DivX, jButtonCosX, jButtonCube, jButtonE, jButtonEPowerX, jButtonLnX, jButtonSQRT, jButtonSinX, jButtonSquare, jButtonTanX, jButtonπ});
 
         jButtonTanX.getAccessibleContext().setAccessibleParent(jPanel2);
         jButtonSquare.getAccessibleContext().setAccessibleParent(jPanel2);
         jButtonCube.getAccessibleContext().setAccessibleParent(jPanel2);
-        jButtonÏ€.getAccessibleContext().setAccessibleParent(jPanel2);
+        jButtonπ.getAccessibleContext().setAccessibleParent(jPanel2);
         jButtonEPowerX.getAccessibleContext().setAccessibleParent(jPanel2);
         jButtonCosX.getAccessibleContext().setAccessibleParent(jPanel2);
         jButton1DivX.getAccessibleContext().setAccessibleParent(jPanel2);
@@ -555,11 +630,11 @@ public class CalculatorFrame extends javax.swing.JFrame
         getAccessibleContext().setAccessibleName("");
 
         pack();
-    }// </editor-fold>//GEN-END:initComponents
+    }// </editor-fold>                        
 
-    private void none(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_none
+    private void none(java.awt.event.ActionEvent evt) {                      
         // TODO add your handling code here:
-    }//GEN-LAST:event_none
+    }                     
 
     /**
      * @param args the command line arguments
@@ -595,7 +670,7 @@ public class CalculatorFrame extends javax.swing.JFrame
         });
     }
 
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+    // Variables declaration - do not modify                     
     private javax.swing.JTextField JCalcField;
     private javax.swing.JButton jButton0;
     private javax.swing.JButton jButton1;
@@ -625,10 +700,10 @@ public class CalculatorFrame extends javax.swing.JFrame
     private javax.swing.JButton jButtonSinX;
     private javax.swing.JButton jButtonSquare;
     private javax.swing.JButton jButtonTanX;
-    private javax.swing.JButton jButtonÏ€;
+    private javax.swing.JButton jButtonπ;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
-    // End of variables declaration//GEN-END:variables
+    // End of variables declaration                   
 }
