@@ -705,5 +705,5 @@ public class CalculatorFrame extends javax.swing.JFrame
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
-    // End of variables declaration                   
+    // End of variables declaration                    
 }
